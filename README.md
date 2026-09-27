@@ -34,6 +34,18 @@ python skill/scripts/bootstrap_workspace.py <你的工作区路径>
 
 依赖：Python ≥3.9（openpyxl / PyMuPDF / python-pptx）、Node.js（全局 pptxgenjs）、LibreOffice（渲染 PNG 用）、ZCode 内置工具（web_reader / browser-use / WebSearch）。详见 `skill/scripts/setup_env.py` 的输出。
 
+## 成品展示
+
+三次真实运行（2026-W39）的完整产出——正文、事实核对清单、三张卡片全部开源，可直接对照流水线各环节的产物形态：
+
+| 让 AI 自己出题自己判卷 | Claude Opus 5.5 发布 | AI 自主科学发现 |
+|:---:|:---:|:---:|
+| [![CodeMidas 封面卡](examples/2026-W39/2026-09-26-CodeMidas/封面卡.png)](examples/2026-W39/2026-09-26-CodeMidas/正文.md) | [![Opus 5.5 封面卡](examples/2026-W39/2026-09-26-Opus5.5/封面卡.png)](examples/2026-W39/2026-09-26-Opus5.5/正文.md) | [![酶发现 封面卡](examples/2026-W39/2026-09-26-Claude酶发现/封面卡.png)](examples/2026-W39/2026-09-26-Claude酶发现/正文.md) |
+| 小米：只用源代码让 AI 自动造编程训练题库 | Anthropic：能力打平旗舰，价格降四成 | Claude 发现新酶系统，登上 Science |
+| [完整笔记](examples/2026-W39/2026-09-26-CodeMidas/正文.md) · [事实核对](examples/2026-W39/2026-09-26-CodeMidas/事实核对.md) | [完整笔记](examples/2026-W39/2026-09-26-Opus5.5/正文.md) · [事实核对](examples/2026-W39/2026-09-26-Opus5.5/事实核对.md) | [完整笔记](examples/2026-W39/2026-09-26-Claude酶发现/正文.md) · [事实核对](examples/2026-W39/2026-09-26-Claude酶发现/事实核对.md) |
+
+每个示例目录含：`正文.md`（成稿）、`事实核对.md`（逐条溯源清单）、`封面卡/内容卡1/内容卡2.png`（1242×1656）、`卡片.js`（该期卡片的生成脚本）。
+
 ## 目录结构
 
 ```
