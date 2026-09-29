@@ -30,7 +30,7 @@ posts/<年份>-Wxx/<今日日期>-<选题短名>/     # 周目录与 weekly/ 的
 
 1. **抓全文**：网页优先用 `web_reader`；arXiv 论文抓 HTML 全文版 `https://arxiv.org/html/<id>`（比摘要多出方法细节和小节定位）；本地 PDF 直接用 Read。只读摘要不算「深度解读」——每个数字都要能定位到小节。抓到的全文转存为 `weekly/<周次>/原材料/论文全文/<短名>-arxiv<id>.md`（带 `sources.md` §五 的元数据头），解读与存档用同一份材料。
 2. **先写 事实核对.md 再写成稿**：正文里每个数字/论断一行，标注论文位置，核对状态列留 `[ ]` 给用户。写成稿时若发现某陈述找不到原文依据，删掉而不是模糊化。
-3. **成稿**：读 `templates/小红书笔记模板.md`（正文骨架、深度要求与硬约束以它为准）。成稿后执行去 AI 味工序：读已安装的 humanize-writing skill（`~/.agents/skills/humanize-writing/SKILL.md`）按其 8 遍流程逐遍过稿，配合 `references/中文AI味清单.md`（中文专属词表）。写完必须实测字数：`python scripts/count_body.py <正文.md 路径>`，超了就删，不注水。
+3. **成稿**：读 `templates/小红书笔记模板.md`（正文骨架、深度要求与硬约束以它为准）。成稿后执行去 AI 味工序：读已安装的 humanize-writing skill（`~/.agents/skills/humanize-writing/SKILL.md`）按其 8 遍流程逐遍过稿，配合 `references/中文AI味清单.md`（中文专属词表）；再对照 `references/对标打法.md`（四位对标博主的技法卡）自查开场、比喻密度与反方意见。写完必须实测字数：`python scripts/count_body.py <正文.md 路径>`，超了就删，不注水。
 4. **做卡片**：读 `references/卡片规范.md`；把 `assets/卡片模板.js` 复制为 `posts/.../卡片.js`，只替换三页的文字内容与数据，保持版式常量、调色板、字号体系不变。运行 `NODE_PATH="$(npm root -g)" node 卡片.js` 生成 `卡片源文件.pptx`。
 5. **渲染**：`python scripts/render_cards.py 卡片源文件.pptx .` → 三张 1242×1656 PNG。
 6. **视觉审查**：把三张 PNG 交给 `presentations:visual-judge` 子代理审版式（溢出/对比度/对齐），不通过的项改 卡片.js 后重渲再审。

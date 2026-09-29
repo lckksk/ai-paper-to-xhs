@@ -46,17 +46,23 @@ python skill/scripts/bootstrap_workspace.py <你的工作区路径>
 
 每个示例目录含：`正文.md`（成稿）、`事实核对.md`（逐条溯源清单）、`封面卡/内容卡1/内容卡2.png`（1242×1656）、`卡片.js`（该期卡片的生成脚本）。
 
+**完整存档**：`posts/` 下按周归档全部成稿（当前 8 篇，2026-W39 ~ W40），`weekly/` 为每周采集原材料与采集日志，`topics.xlsx` 为选题与数据台账——三者构成完整的运行存档。
+
 ## 目录结构
 
 ```
 skill/                    jiedu-lunwen 主 skill
-├── SKILL.md              全流程编排（触发方式、采集窗口、产能规则）
+├── SKILL.md              全流程编排（按需触发、采集窗口、产能规则）
 ├── references/卡片规范.md  卡片设计系统（版式骨架、调色板、渲染链）
 ├── references/中文AI味清单.md  中文去 AI 味词表
+├── references/对标打法.md  对标博主技法卡（成稿自查用）
 ├── assets/卡片模板.js     卡片骨架（改内容不改骨架）
 └── scripts/              setup_env / bootstrap_workspace / export_bundle / render_cards / count_body
 humanize-writing/         第三方去 AI 味 skill（MIT，见致谢）
 workspace-template/       新工作区种子（sources.md 信息源与规则手册、小红书笔记模板）
+posts/                    成品存档（按周归档，全部已发布）
+weekly/                   每周采集原材料与日志
+topics.xlsx               选题与发布数据台账
 ```
 
 ## 设计原则
