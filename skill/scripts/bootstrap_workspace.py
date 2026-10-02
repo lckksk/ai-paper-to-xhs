@@ -109,9 +109,9 @@ def main():
         print("  跳过已存在: topics.xlsx")
 
     # 4. 安装 skills
-    skill_dst = os.path.join(target, ".agents", "skills", "jiedu-lunwen")
+    skill_dst = os.path.join(target, ".agents", "skills", "lunjian")
     copy_tree(os.path.join(BUNDLE, "skill"), skill_dst, force)
-    print(f"  jiedu-lunwen skill → {skill_dst}")
+    print(f"  lunjian skill → {skill_dst}")
     if os.path.isdir(HUMANIZE):
         hu_dst = os.path.join(os.path.expanduser("~"), ".agents", "skills", "humanize-writing")
         copy_tree(HUMANIZE, hu_dst, force)

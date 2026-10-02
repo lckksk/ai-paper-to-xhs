@@ -1,6 +1,6 @@
 ---
-name: jiedu-lunwen
-description: 解读 AI 论文与厂商博客，产出可直接发布的小红书发布物：成稿、事实核对清单、3:4 配图卡片、台账回填。只要用户给出 arXiv / Hugging Face Papers / 厂商博客的链接或论文 PDF，要求「解读这篇论文」「写成小红书笔记」「出卡片/配图」，或要求按 sources.md 跑每周选题-成稿流水线，都使用本 skill——即使用户没有明说「小红书」或「发布」。
+name: lunjian
+description: 【论见】解读 AI 论文与厂商博客，产出可直接发布的小红书发布物：成稿、事实核对清单、3:4 配图卡片、台账回填。只要用户给出 arXiv / Hugging Face Papers / 厂商博客的链接或论文 PDF，要求「解读这篇论文」「写成小红书笔记」「出卡片/配图」，或要求按 sources.md 跑每周选题-成稿流水线，或用户说「跑论见」「启动论见」「论见今天」/「论见这篇」，都使用本 skill——即使用户没有明说「小红书」或「发布」。
 ---
 
 # 解读论文 → 小红书发布物
@@ -68,7 +68,7 @@ Doing + 唯一优先级；结论写入台账发布记录「复盘」列。
 
 整套系统（skill + 规范 + 迁移脚本）可打包迁往新机器：
 
-- **打包**：`python .agents/skills/jiedu-lunwen/scripts/export_bundle.py` → `migration/jiedu-lunwen-bundle-<日期>/`（skill + humanize-writing + 工作区种子 + 数据存档 + README）及同名 zip；`--no-data` 可只打系统不打数据
+- **打包**：`python .agents/skills/lunjian/scripts/export_bundle.py` → `migration/lunjian-bundle-<日期>/`（skill + humanize-writing + 工作区种子 + 数据存档 + README）及同名 zip；`--no-data` 可只打系统不打数据
 - **恢复**：解压后依次运行 `python skill/scripts/setup_env.py --fix`（环境自检/装依赖）和 `python skill/scripts/bootstrap_workspace.py <新工作区路径>`（初始化工作区并安装两个 skill）
 - **数据迁移**：旧机 `weekly/`、`posts/`、`topics.xlsx` 拷到新工作区同名位置即可
 - 迁移后在新工作区照常使用本 skill；工作区种子里的 sources.md 是打包时点的版本，可继续维护

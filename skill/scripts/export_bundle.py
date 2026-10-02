@@ -4,9 +4,9 @@
 用法:
     python export_bundle.py [--no-data] [--force]
 
-产出: migration/jiedu-lunwen-bundle-<日期>/ 与同名 .zip
+产出: migration/lunjian-bundle-<日期>/ 与同名 .zip
   ├── README-迁移指南.md
-  ├── skill/                  jiedu-lunwen（含迁移脚本）
+  ├── skill/                  lunjian（含迁移脚本）
   ├── humanize-writing/       第三方去AI味 skill（用户级安装）
   ├── workspace-seed/         新工作区种子（sources.md、templates/）
   └── data/                   当前工作区数据存档（weekly/、posts/、topics.xlsx）
@@ -17,7 +17,7 @@ import shutil
 import sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-SKILL = os.path.dirname(HERE)                          # .agents/skills/jiedu-lunwen
+SKILL = os.path.dirname(HERE)                          # .agents/skills/lunjian
 ROOT = os.path.abspath(os.path.join(HERE, "..", "..", "..", ".."))   # 工作区根（scripts→skill→skills→.agents→root）
 README = """# 「论文与博客解读」迁移包（{date}）
 
@@ -27,7 +27,7 @@ README = """# 「论文与博客解读」迁移包（{date}）
 
 | 目录 | 用途 | 安装位置 |
 |---|---|---|
-| `skill/` | jiedu-lunwen 主 skill（含迁移脚本） | `<工作区>/.agents/skills/jiedu-lunwen/` |
+| `skill/` | lunjian 主 skill（含迁移脚本） | `<工作区>/.agents/skills/lunjian/` |
 | `humanize-writing/` | 去 AI 味 skill（第三方，MIT） | `~/.agents/skills/humanize-writing/`（用户级） |
 | `workspace-seed/` | 新工作区种子（sources.md、笔记模板） | `<工作区>/` 下对应位置 |
 | `data/` | 打包当日的运行数据（weekly/、posts/、topics.xlsx） | 可选，拷到 `<工作区>/` 同名位置 |
@@ -67,7 +67,7 @@ python skill/scripts/bootstrap_workspace.py <新工作区路径>
 
 ## 更新本 bundle
 
-在旧工作区重跑 `python .agents/skills/jiedu-lunwen/scripts/export_bundle.py` 即可按当日状态重新打包。
+在旧工作区重跑 `python .agents/skills/lunjian/scripts/export_bundle.py` 即可按当日状态重新打包。
 """
 
 IGNORE = shutil.ignore_patterns("__pycache__", "*.pyc", "node_modules")
@@ -85,7 +85,7 @@ def main():
     no_data = "--no-data" in sys.argv
     force = "--force" in sys.argv
     date = datetime.date.today().strftime("%Y-%m-%d")
-    out = os.path.join(ROOT, "migration", f"jiedu-lunwen-bundle-{date}")
+    out = os.path.join(ROOT, "migration", f"lunjian-bundle-{date}")
     if os.path.exists(out):
         if not force:
             sys.exit(f"已存在 {out}\n覆盖请加 --force")
