@@ -7,7 +7,7 @@
 
 | 来源 | 地址 | 更新频率 | 抓取方式 | 说明 |
 |---|---|---|---|---|
-| Hugging Face Daily Papers | https://huggingface.co/papers | 每日 | web_reader | **采集主入口**；周视图 `https://huggingface.co/papers/week/<年份>-Wxx` |
+| Hugging Face Daily Papers | https://huggingface.co/papers | 每日 | curl + 本地代理 API | **采集主入口**；⚠️ 网页版已改 Trending 流（2026-10-04），HTML 抓取失效，走 API：`https://huggingface.co/api/daily_papers?date=<YYYY-MM-DD>`，返回 JSON 含 upvotes。⚠️ HF 直连超时，**必须经代理**（2026-10-14 起端口 7897，7890 已失效——Clash Verge 更新会改端口，失效时 netstat 扫 LISTENING 端口即可找到新口） |
 | arXiv cs.CL（NLP） | https://arxiv.org/list/cs.CL/recent | 每工作日 | web_reader | 量大，只扫标题，兜底用 |
 | arXiv cs.AI / cs.LG | https://arxiv.org/list/cs.AI/recent | 每工作日 | web_reader | 同上 |
 | alphaXiv | https://www.alphaxiv.org/ | 实时 | web_reader | 讨论热度交叉验证，防赞数虚高 |
@@ -23,13 +23,28 @@
 | Meta AI | https://ai.meta.com/blog/ | web_reader | |
 | Microsoft Research | https://www.microsoft.com/en-us/research/blog/ | web_reader | |
 | NVIDIA | https://blogs.nvidia.com/ | web_reader | |
-| DeepSeek | GitHub: https://github.com/deepseek-ai/releases | web_reader | ⚠️ /news/ 已失效（2026-09-26 重定向到文档首页），改抓 GitHub releases |
-| 通义千问 Qwen | https://qwen.ai/blog | web_reader | ⚠️ /blogs 返回产品页（2026-09-26），改单数路径，失败则用 HF org 页 |
-| 智谱 AI | https://www.zhipuai.cn/news | web_reader / browser-use | |
-| Moonshot / Kimi | https://www.kimi.com/en/blog | web_reader | ⚠️ moonshotai.github.io 已重定向（2026-09-26） |
-| MiniMax | 官网公告页（路径待定） | browser-use | ⚠️ /news 无新闻列表（2026-09-26），临时改公众号/GitHub |
-| 字节 Seed | https://seed.bytedance.com/ | WebFetch/browser-use | |
-| 阶跃星辰 | https://www.stepfun.com/#news | browser-use | ⚠️ 纯 JS 渲染，web_reader/WebFetch 均无效（2026-09-26） |
+| DeepSeek | HF org 页: https://huggingface.co/DeepSeek + 公众号 | WebFetch | ⚠️ /news/ 已失效（2026-09-26 重定向）；⚠️ GitHub org 不发 release（2026-10-14 实测 `github.com/deepseek-ai/releases` 404，DeepSeek-V3 repo 仅 2025-06 存档），弃 GitHub 路线 |
+| 通义千问 Qwen | https://qwen.ai/blog | browser-use | ⚠️ /blog JS 渲染无列表（2026-10-14 复验仍如此），WebFetch 无效 |
+| 智谱 AI | 公众号 | WebSearch | ⚠️ 降级（2026-10-14）：官网 /news 重定向 z.ai 首页，新闻列表消失 |
+| Moonshot / Kimi | https://www.kimi.com/en/blog | web_reader | ⚠️ moonshotai.github.io 已重定向（2026-09-26）；页面健康（2026-10-14 体检），只是源安静（07-16 后无更新） |
+| MiniMax | https://www.minimax.io/news | browser-use | ⚠️ /news 可达但需进详情页确认日期（条目标 NEW 无日期，2026-10-14） |
+| 字节 Seed | https://seed.bytedance.com/ | WebFetch | 页面健康（2026-10-14 体检），源安静（08-05 后无更新） |
+| 阶跃星辰 | https://www.stepfun.com/#news | browser-use | ⚠️ 纯 JS 渲染，WebFetch 无效（2026-09-26，10-14 复验） |
+| Meta AI | https://ai.meta.com/blog/ | browser-use | ⚠️ WebFetch 两次失败（2026-10-14）；curl+代理可达但无结构化列表，改浏览器抓 |
+
+> 全量体检快照（2026-10-14，7✅/5⚠️）：`weekly/2026-W42/原材料/厂商/全量体检-1014.md`。
+> 需要浏览器抓的源，操作方法见 skill `references/浏览器自动化-WorkBuddy.md`。
+
+## 二·五、顶刊信息源（2026-10-14 新增）
+
+> 定位：Nature/Science 级「听起来厉害」+ 硬核数字，与清熙体文风绝配。
+> **只选 AI×X 交叉条目**（AI+医疗/能源/社会/数学），纯生物/物理/化学不选（讲人话难度过不了 BRENS）。
+> 学术会议（NeurIPS 等）不纳入——HF 榜已覆盖。
+
+| 来源 | 地址 | 更新频率 | 抓取方式 | 说明 |
+|---|---|---|---|---|
+| Nature | RSS: https://www.nature.com/nature.rss | 每日 | curl + 代理（经 7897 验证可抓，76 条） | 含 AI 交叉话题 |
+| Science News | RSS: https://www.science.org/rss/news_current.xml | 每日 | curl + 代理（验证可抓，10 条） | AI 相关密度高（当期实测：AI 逼近黎曼猜想 / OpenAI 改变数学 / AI 还是人写的论文） |
 
 ## 三、按需采集流程（用户触发，支持每天一更）
 

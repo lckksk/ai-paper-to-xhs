@@ -35,7 +35,7 @@ posts/<年份>-Wxx/<今日日期>-<选题短名>/     # 周目录与 weekly/ 的
 
 1. **抓全文**：网页优先用 `WebFetch`（或 `WebSearch` 定位）；arXiv 论文抓 HTML 全文版 `https://arxiv.org/html/<id>`（比摘要多出方法细节和小节定位）；本地 PDF 直接用 Read。只读摘要不算「深度解读」——每个数字都要能定位到小节。抓到的全文转存为 `weekly/<周次>/原材料/论文全文/<短名>-arxiv<id>.md`（带 `sources.md` §五 的元数据头），解读与存档用同一份材料。
 2. **先写 事实核对.md 再写成稿**：正文里每个数字/论断一行，标注论文位置，核对状态列留 `[ ]` 给用户。写成稿时若发现某陈述找不到原文依据，删掉而不是模糊化。
-3. **成稿**：读 `templates/小红书笔记模板.md`（正文骨架、深度要求与硬约束以它为准）。成稿后执行去 AI 味工序：读已安装的 humanize-writing skill（`~/.workbuddy/skills/humanize-writing/SKILL.md`）按其 8 遍流程逐遍过稿，配合 `references/中文AI味清单.md`（中文专属词表）。写完必须实测字数：`python scripts/count_body.py <正文.md 路径>`，超了就删，不注水。
+3. **成稿**：读 `templates/小红书笔记模板.md`（正文骨架、深度要求与硬约束以它为准）；**文风基准（2026-10-14 起）**：读 `references/文风参考-清熙体.md`，按其 7 节拍 + 8 条执行清单写（类比开场、动词化小标题、一句一段、硬核数字精确到个位、不鸡汤收口）。成稿后执行去 AI 味工序：读已安装的 humanize-writing skill（`~/.workbuddy/skills/humanize-writing/SKILL.md`）按其 8 遍流程逐遍过稿，配合 `references/中文AI味清单.md`（中文专属词表）。写完必须实测字数：`python scripts/count_body.py <正文.md 路径>`，超了就删，不注水。
 4. **做卡片**：读 `references/卡片规范.md`；把 `assets/卡片模板.js` 复制为 `posts/.../卡片.js`，只替换三页的文字内容与数据，保持版式常量、调色板、字号体系不变。运行 `NODE_PATH="$(npm root -g)" node 卡片.js` 生成 `卡片源文件.pptx`。
 5. **渲染**：`python scripts/render_cards.py 卡片源文件.pptx .` → 三张 1242×1656 PNG（需 LibreOffice）。
 6. **视觉审查**：把三张 PNG 交给视觉审查（人工或子代理）审版式（溢出/对比度/对齐），不通过的项改 卡片.js 后重渲再审。
