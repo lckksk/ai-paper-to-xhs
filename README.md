@@ -1,6 +1,6 @@
 # ai-paper-to-xhs
 
-一套跑在 [ZCode](https://zcode.ai)（或同类 AI 编码助手）里的内容生产流水线：**把 AI 论文和厂商博客，变成可发布的小红书笔记**。
+一套跑在 [WorkBuddy](https://www.workbuddy.cn)（原 ZCode 版，已迁移适配）里的内容生产流水线：**把 AI 论文和厂商博客，变成可发布的小红书笔记**。
 
 > 设计目标：AI 负责采集、解读、成稿、做图；人负责事实终审与发布。学术内容翻车成本高，终审关卡永远保留。
 >
@@ -37,25 +37,26 @@ python skill/scripts/bootstrap_workspace.py <你的工作区路径>
 # 4) 在 ZCode 中打开工作区，说「跑今天」「跑最近一周」或「解读这篇 + <链接>」
 ```
 
-依赖：Python ≥3.9（openpyxl / PyMuPDF / python-pptx）、Node.js（全局 pptxgenjs）、LibreOffice（渲染 PNG 用）、ZCode 内置工具（web_reader / browser-use / WebSearch）。详见 `skill/scripts/setup_env.py` 的输出。
+依赖：Python ≥3.9（openpyxl / PyMuPDF / python-pptx）、Node.js（全局 pptxgenjs）、LibreOffice（渲染 PNG 用）、WorkBuddy 内置工具（WebFetch / WebSearch / 后台任务）。详见 `skill/scripts/setup_env.py` 的输出。
 
 ## 成品展示
 
-最新两次运行的完整产出——正文、事实核对清单、三张卡片，可直接对照流水线各环节的产物形态：
+最新一次运行的完整产出——正文、事实核对清单、全套卡片，可直接对照流水线各环节的产物形态：
 
-| GPT-6 上岗机器人 | AI 给 AI 搭工位 |
+| 你让AI别想，它还在偷偷想（深度版 6 卡） | 机器人学会用眼睛接箱子（标准版 3 卡） |
 |:---:|:---:|
-| [![GPT-6 机器人封面卡](examples/2026-W40/2026-10-01-GPT6-Astra-Robot/封面卡.png)](examples/2026-W40/2026-10-01-GPT6-Astra-Robot/正文.md) | [![Meta-Skills 封面卡](examples/2026-W40/2026-10-01-MetaSkill-AI4AI/封面卡.png)](examples/2026-W40/2026-10-01-MetaSkill-AI4AI/正文.md) |
-| Galbot 给 GPT-6 安排六门机器人考试：会认路 92%，不会走路 0/5 | UIUC 当日榜首：管家 AI 学搭环境，教原则比给资源多拿 12 分 |
-| [完整笔记](examples/2026-W40/2026-10-01-GPT6-Astra-Robot/正文.md) · [事实核对](examples/2026-W40/2026-10-01-GPT6-Astra-Robot/事实核对.md) | [完整笔记](examples/2026-W40/2026-10-01-MetaSkill-AI4AI/正文.md) · [事实核对](examples/2026-W40/2026-10-01-MetaSkill-AI4AI/事实核对.md) |
+| [![ThinkingInertia 封面卡](examples/2026-W42/2026-10-14-ThinkingInertia-深度版/封面卡.png)](examples/2026-W42/2026-10-14-ThinkingInertia-深度版/正文.md) | [![Reflex 封面卡](examples/2026-W42/2026-10-14-Reflex-G1接箱子/封面卡.png)](examples/2026-W42/2026-10-14-Reflex-G1接箱子/正文.md) |
+| 清华×牛津×斯坦福实测：关掉思考开关，开放题 99.9% 照样偷想，强行只答准确率掉 15pp | 宇树 G1 纯视觉反应接住人扔的箱子：真机 2.5 米成功率 65%，为人类水平的 76% |
+| [完整笔记](examples/2026-W42/2026-10-14-ThinkingInertia-深度版/正文.md) · [事实核对](examples/2026-W42/2026-10-14-ThinkingInertia-深度版/事实核对.md) | [完整笔记](examples/2026-W42/2026-10-14-Reflex-G1接箱子/正文.md) · [事实核对](examples/2026-W42/2026-10-14-Reflex-G1接箱子/事实核对.md) |
 
-每个示例目录含：`正文.md`（成稿）、`事实核对.md`（逐条溯源清单）、`封面卡/内容卡1/内容卡2.png`（1242×1656）。
+每个示例目录含：`正文.md`（成稿）、`事实核对.md`（逐条溯源清单）、`封面卡/内容卡*.png`（1242×1656，深度版 6 张 / 标准版 3 张）。
 
 ## 目录结构
 
 ```
 skill/                    jiedu-lunwen 主 skill
-├── SKILL.md              全流程编排（按需触发、采集窗口、产能规则、复盘框架）
+├── SKILL.md              全流程编排（ZCode 原版）
+├── SKILL.workbuddy.md    WorkBuddy 适配版（当前生产在用）
 ├── references/卡片规范.md  卡片设计系统（版式骨架、调色板、渲染链）
 ├── references/中文AI味清单.md  中文去 AI 味词表
 ├── references/发布前检查清单.md  平台硬限 / 敏感词 / 关键词布局 / 收藏价值
