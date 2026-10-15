@@ -68,8 +68,21 @@ await browser.close();
 - 图片 file input 的 accept 是**扩展名形式** `.jpg,.jpeg,.png,.webp`（不是 `image/*`），
   且可能不可见——按 `state:'attached'` 等，不要等 visible
 - AI 声明：表单里「添加内容类型声明」下拉 → 选「笔记含AI合成内容」，可自动化
-- ⚠️ 底部「发布」「暂存离开」按钮**在所有 frame 的 DOM 中都搜不到**（疑似特殊渲染），
-  目前只能人工点。半自动分工：脚本填完表单停住，人只点发布/暂存
+- ✅ **发布按钮已攻克（2026-10-15 全自动发布成功）**：底部「发布」「暂存离开」是自定义元素
+  `<xhs-publish-btn>`（Shadow DOM Web Component），一切常规 DOM/文本/frame 搜索都搜不到
+  （v1-v10 与 xhs-mcp 的 `button.publishBtn` 全栽在这）。可行解：
+  1. `window.scrollTo(0, scrollHeight)` 让底部操作栏进视口
+  2. `document.elementFromPoint` 在底缘扫描（1920x1080 下发布键中心 ≈ (951,1050)），
+     沿祖先链匹配文本「发布」后取中心坐标
+  3. 兜底：截图实测坐标 + `page.mouse.click(x,y)` 真实鼠标点击（穿越 Shadow DOM/iframe 均有效），
+     点前先用 elementFromPoint 核对落点文本，避免误触左边的「暂存离开」
+- 编辑器已从 Quill 换成 **Tiptap**（`div.tiptap.ProseMirror`），`ql-editor` 选择器失效；
+  标题填法：原生 setter + `dispatchEvent(input)`；正文：click 后 `keyboard.insertText`
+- 传图后有关闭引导弹窗（「图片可以编辑啦」→ `button.feature-guide__btn`「我知道了」）
+- AI 声明：表单里「添加内容类型声明」可点开，但选项元素暂未稳定匹配到（待改进）；
+  不声明也可直接发布（已实测），合规上建议后续补上
+- 表单中断时小红书会**自动存草稿**，反复试跑会留垃圾草稿，注意清理
+- 可复用模板：`publish_v12.js`（工作区 xhs_data/），改 IMAGES/TITLE/BODY/TAGS 四常量即可
 - 表单中断时小红书会**自动存草稿**，反复试跑会留垃圾草稿，注意清理
 
 ## 五、脚本纪律
