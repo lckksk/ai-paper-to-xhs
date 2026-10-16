@@ -119,6 +119,16 @@ function parsePost(dir) {
   const browser = await chromium.launch({ executablePath: CHROME, headless: false });
   const ctx = await browser.newContext({ viewport: { width: 1920, height: 1080 }, storageState: STATE_TMP });
   const page = await ctx.newPage();
+  // 登录态保鲜：每次用完回写账号库（否则库里 state 放几小时就过期，第二天自动化全灭）
+  const saveState = async () => {
+    try {
+      const s = await ctx.storageState();
+      fs.writeFileSync(STATE_TMP, JSON.stringify(s), 'utf-8');
+      const w = new Database(DB);
+      w.prepare("UPDATE accounts SET state=? WHERE name='Master的小红书'").run(JSON.stringify(s));
+      w.close();
+    } catch (e) { log('⚠️ 登录态回写失败:', e.message); }
+  };
   await page.goto('https://creator.xiaohongshu.com/publish/publish?source=official', { waitUntil: 'load', timeout: 60000 });
   await page.waitForTimeout(4000);
   if (page.url().includes('login') || page.url().includes('passport')) throw new Error('登录态失效，需重新扫码');
@@ -275,7 +285,7 @@ function parsePost(dir) {
     const okTime = schedVal.some(v => v.includes(SCHED_DATE) && v.includes(SCHED_TIME));
     if (!okTime) {
       log('‼️ 定时时间未改成 ' + SCHED_TIME + '，中止（不会点发布）');
-      await ctx.storageState({ path: STATE_TMP });
+      await saveState();
       await browser.close();
       process.exit(3);
     }
@@ -286,7 +296,7 @@ function parsePost(dir) {
   if (DRY) {
     await shot(page, 'dry-final');
     log('✅ DRY 全流程通过（未点发布）');
-    await ctx.storageState({ path: STATE_TMP });
+    await saveState();
     await browser.close();
     process.exit(0);
   }
@@ -323,7 +333,7 @@ function parsePost(dir) {
   log(ok ? '✅ 发布成功' : '⚠️ 未捕获成功标志', 'URL=' + finalUrl);
   fs.writeFileSync(`${LOG_DIR}/result-${MODE}.txt`,
     `${ok ? 'OK' : 'UNCERTAIN'} mode=${MODE} sched=${SCHED_DATE + ' ' + SCHED_TIME} ${new Date().toISOString()} url=${finalUrl}`);
-  await ctx.storageState({ path: STATE_TMP });
+  await saveState();
   await browser.close();
   process.exit(ok ? 0 : 2);
 })().catch(e => { console.error('❌ 失败:', e.message); process.exit(1); });
