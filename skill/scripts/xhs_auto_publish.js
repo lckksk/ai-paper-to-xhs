@@ -109,17 +109,39 @@ function parsePost(dir) {
   log(`成稿解析 ✓ 标题「${title}」${images.length}图 ${tags.length}话题 模式=${MODE}${DRY ? ' [DRY]' : ''}`);
   if (MODE === 'schedule') log(`定时目标: ${SCHED_DATE} ${SCHED_TIME}`);
 
-  // ── 登录态：从 xhs-mcp 账号库实时导出 ──
-  const db = new Database(DB, { readonly: true });
-  const acct = db.prepare("SELECT name, state FROM accounts WHERE status='active' ORDER BY rowid DESC LIMIT 1").get();
-  db.close();
-  if (!acct || !acct.state) throw new Error('xhs-mcp 账号库中无有效登录态（先 xhs_add_account 扫码）');
-  fs.writeFileSync(STATE_TMP, acct.state, 'utf-8');
-
-  const browser = await chromium.launch({ executablePath: CHROME, headless: false });
-  const ctx = await browser.newContext({ viewport: { width: 1920, height: 1080 }, storageState: STATE_TMP });
+  // ── 浏览器：持久化配置目录（固定设备指纹，2026-10-16 风控警告后改造）──
+  // 所有自动化（发布/拆解/删除）共用 C:/Users/Lenovo/.xhs-mcp/pw-profile，
+  // 在小红书眼里永远是同一台电脑，杜绝「每次登录换设备」触发风控。
+  // pw-profile 未登录时用账号库 cookie 兜底；再不行就报错等人工扫码。
+  const USER_DATA_DIR = 'C:/Users/Lenovo/.xhs-mcp/pw-profile';
+  const ctx = await chromium.launchPersistentContext(USER_DATA_DIR, {
+    executablePath: CHROME, headless: false, viewport: { width: 1920, height: 1080 },
+  });
   const page = await ctx.newPage();
-  // 登录态保鲜：每次用完回写账号库（否则库里 state 放几小时就过期，第二天自动化全灭）
+  await page.goto('https://creator.xiaohongshu.com/publish/publish?source=official', { waitUntil: 'load', timeout: 60000 });
+  await page.waitForTimeout(4000);
+  if (page.url().includes('login') || page.url().includes('passport')) {
+    // 兜底：灌账号库 cookie（创作中心不校验设备指纹，外灌可用）
+    try {
+      const db0 = new Database(DB, { readonly: true });
+      const acct0 = db0.prepare("SELECT state FROM accounts WHERE status='active' ORDER BY rowid DESC LIMIT 1").get();
+      db0.close();
+      if (acct0) {
+        const cookies = JSON.parse(acct0.state).cookies.map(c => ({
+          name: c.name, value: c.value, domain: c.domain, path: c.path || '/',
+          expires: c.expires ?? -1, httpOnly: !!c.httpOnly, secure: !!c.secure, sameSite: c.sameSite || 'Lax',
+        }));
+        await ctx.addCookies(cookies);
+        await page.goto('https://creator.xiaohongshu.com/publish/publish?source=official', { waitUntil: 'load', timeout: 60000 });
+        await page.waitForTimeout(4000);
+      }
+    } catch (e) { log('cookie 兜底失败:', e.message.slice(0, 80)); }
+  }
+  if (page.url().includes('login') || page.url().includes('passport')) {
+    await ctx.close();
+    throw new Error('登录态失效且 cookie 兜底无效，需人工在 pw-profile 窗口扫码');
+  }
+  // 登录态保鲜：每次用完回写账号库（MCP/其他脚本共用）
   const saveState = async () => {
     try {
       const s = await ctx.storageState();
@@ -129,9 +151,6 @@ function parsePost(dir) {
       w.close();
     } catch (e) { log('⚠️ 登录态回写失败:', e.message); }
   };
-  await page.goto('https://creator.xiaohongshu.com/publish/publish?source=official', { waitUntil: 'load', timeout: 60000 });
-  await page.waitForTimeout(4000);
-  if (page.url().includes('login') || page.url().includes('passport')) throw new Error('登录态失效，需重新扫码');
 
   // 1. tab + 传图
   for (let t = 0; t < 20; t++) {
@@ -286,7 +305,7 @@ function parsePost(dir) {
     if (!okTime) {
       log('‼️ 定时时间未改成 ' + SCHED_TIME + '，中止（不会点发布）');
       await saveState();
-      await browser.close();
+      await ctx.close();
       process.exit(3);
     }
   } else if (DRY) {
@@ -297,7 +316,7 @@ function parsePost(dir) {
     await shot(page, 'dry-final');
     log('✅ DRY 全流程通过（未点发布）');
     await saveState();
-    await browser.close();
+    await ctx.close();
     process.exit(0);
   }
 
@@ -334,6 +353,6 @@ function parsePost(dir) {
   fs.writeFileSync(`${LOG_DIR}/result-${MODE}.txt`,
     `${ok ? 'OK' : 'UNCERTAIN'} mode=${MODE} sched=${SCHED_DATE + ' ' + SCHED_TIME} ${new Date().toISOString()} url=${finalUrl}`);
   await saveState();
-  await browser.close();
+  await ctx.close();
   process.exit(ok ? 0 : 2);
 })().catch(e => { console.error('❌ 失败:', e.message); process.exit(1); });
