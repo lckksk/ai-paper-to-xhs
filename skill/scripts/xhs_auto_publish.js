@@ -88,10 +88,14 @@ function parsePost(dir) {
   let order = [];
   const imgNames = section('配图').flatMap(l => l.trim().split(/[/,，、\s]+/)).filter(Boolean);
   if (imgNames.length) {
+    const missing = [];
     for (const n of imgNames) {
       const f = files.find(f => f.startsWith(n) || f.includes(n));
-      if (f) order.push(f); else log('⚠️ 配图清单项未找到文件:', n);
+      if (f) order.push(f); else missing.push(n);
     }
+    // ⚠️ 2026-10-16 AgentSWE 事故：清单与文件名不匹配被静默跳过，笔记只带封面就发出去了。
+    // 改为硬中止——宁可这一篇不发，绝不发残篇。
+    if (missing.length) throw new Error(`配图清单与文件名不匹配: ${missing.join('、')}（目录内文件: ${files.join('、')}）——中止发布，先改正文.md 配图清单或改文件名`);
   }
   if (!order.length) {
     order = files.slice().sort((a, b) => (b.startsWith('封面') - a.startsWith('封面')) || a.localeCompare(b, 'zh', { numeric: true }));
