@@ -189,7 +189,27 @@ function parsePost(dir) {
   await page.keyboard.insertText(body);
   await page.waitForTimeout(1200);
 
-  // 3. 话题
+  // 3. 话题 —— 2026-10-17 Master 反馈 # 话题可能插到错误位置。
+  // 修复：先把光标强制压到正文最末（selectAllChildren+collapseToEnd + Ctrl+End 双保险），另起一行再输入，
+  //      保证话题永远独立成正文最后一行；打完后回读末行校验。
+  if (tags.length) {
+    const atEnd = await page.evaluate(() => {
+      try {
+        const ed = document.querySelector('div.tiptap, div.ProseMirror, [role="textbox"]');
+        if (!ed) return false;
+        ed.focus();
+        const sel = window.getSelection();
+        sel.selectAllChildren(ed);
+        sel.collapseToEnd();
+        return true;
+      } catch (e) { return false; }
+    });
+    await page.keyboard.press('Control+End');
+    await page.waitForTimeout(300);
+    await page.keyboard.press('Enter'); // 话题独立成行（最后一行）
+    await page.waitForTimeout(300);
+    log('光标压到正文末尾:', atEnd, '话题另起一行 ✓');
+  }
   for (const tag of tags) {
     await page.keyboard.type('#' + tag, { delay: 30 });
     await page.waitForTimeout(1200);
@@ -203,6 +223,15 @@ function parsePost(dir) {
     log('话题', tag, hit ? '✓' : '✓空格');
     await page.waitForTimeout(600);
   }
+  // 末行校验：确认话题真的落在正文最后一行
+  const lastLine = await page.evaluate(() => {
+    const ed = document.querySelector('div.tiptap, div.ProseMirror, [role="textbox"]');
+    if (!ed) return '';
+    const kids = [...ed.children].filter(e => e.getBoundingClientRect().height > 0);
+    return (kids[kids.length - 1]?.textContent || '').trim();
+  });
+  const miss = tags.filter(t => !lastLine.includes(t));
+  log(`末行校验: 「${lastLine.slice(0, 50)}」${miss.length ? ' ⚠️ 未落在末行: ' + miss.join('、') : ' ✓ 话题全部在最后一行'}`);
 
   // 4. AI 内容类型声明（默认必带）
   if (DECLARE) {
