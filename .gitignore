@@ -4,3 +4,10 @@ node_modules/
 *.zip
 .DS_Store
 Thumbs.db
+
+# 视频成片与渲染中间产物不入库（体积大、可重渲）
+*.mp4
+examples/**/film/renders/
+examples/**/film/frames/
+examples/**/film/review/
+examples/**/film/audio/
