@@ -30,6 +30,9 @@
 
 安装位置：`E:/WorkBuddyData/skills/vibe-knowledge-film/`（含字体与样例，约 139MB，不入仓库）
 
+来源：[HeyChengC/vibe-knowledge-film](https://github.com/HeyChengC/vibe-knowledge-film)（2026-10-19 时 389★）。
+⚠️ 该仓库 LICENSE 为 `NOASSERTION`（非标准开源协议）——**只在本机使用，不把其引擎代码复制进本仓库再分发**；本仓库只收自己写的 `film.js` 与本文档，并注明方法论出处。
+
 ```
 <成稿目录>/film/
 ├── index.html        画布容器（改了竖屏 CSS）

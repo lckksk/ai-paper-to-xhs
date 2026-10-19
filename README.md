@@ -78,6 +78,18 @@ workspace-template/       新工作区种子（sources.md 信息源与规则手�
 examples/                 最新样例（只保留最近一跑，向前滚动更新）
 ```
 
+## 依赖的外部 skill（不随本仓库分发）
+
+本仓库只存「规范和成稿」，真正跑起来用到的第三方 skill 需自行安装：
+
+| skill | 仓库 | 用途 | 安装位置 |
+|---|---|---|---|
+| vibe-knowledge-film | [HeyChengC/vibe-knowledge-film](https://github.com/HeyChengC/vibe-knowledge-film) | 无旁白知识短片的渲染引擎（Canvas 逐帧 + Playwright 截图 + FFmpeg）与「先找形象再写文案」方法论 | `~/.workbuddy/skills/vibe-knowledge-film/`（本项目实际在 `E:/WorkBuddyData/skills/`） |
+| humanize-writing | [jpeggdev/humanize-writing](https://github.com/jpeggdev/humanize-writing) | 8 遍去 AI 味编辑工序 | `~/.workbuddy/skills/humanize-writing/` |
+| xhs-account-teardown | 本项目 `skill/scripts/fetch_*_pw.js` 为其 Playwright 适配版 | 对标账号拆解（只读公开数据） | `~/.workbuddy/skills/xhs-account-teardown/` |
+
+**合规说明**：vibe-knowledge-film 的 LICENSE 为 `NOASSERTION`（非标准开源协议），因此**只在本机使用、不复制其引擎代码进本仓库**；本仓库只收录自己写的 `film.js`（成片源码）与规范化文档，并注明方法论出处。成片发布时按平台要求声明 AIGC。
+
 ## 设计原则
 
 1. **事实红线**：引号里的数字必须能在原文中指出位置，找不到就不写；候选链接必须来自抓取原文
