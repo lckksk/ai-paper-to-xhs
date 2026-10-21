@@ -10,7 +10,7 @@ description: 解读 AI 论文与厂商博客，产出可直接发布的小红书
 > **WorkBuddy 适配说明**（原版面向 ZCode）：
 > - 原文提到的 `web_reader` / `browser-use` → 本环境用 `WebFetch` + `WebSearch` 替代。
 > - humanize-writing 路径：`~/.workbuddy/skills/humanize-writing/SKILL.md`。
-> - 卡片渲染依赖 `pptxgenjs`（Node 全局）+ `LibreOffice`（`soffice`）。若本机未装，可产出 `卡片.js` 但无法自动转 PNG，需手动在装有 LibreOffice 的机器上 `python scripts/render_cards.py 卡片源文件.pptx .` 渲染。
+> - 卡片渲染（2026-10-21 起）走 HTML 引擎：`assets/卡片-HTML/cards.js` 出 HTML，`assets/卡片-HTML/render.js` 用 Playwright 截图出 PNG。依赖本机 Chrome（`C:/Users/Lenovo/.agent-browser/browsers/chrome-155.0.8059.79/chrome.exe`）+ `playwright-core`。旧的 pptxgenjs + LibreOffice 管线已退役。
 
 ## 输入
 
@@ -27,7 +27,7 @@ description: 解读 AI 论文与厂商博客，产出可直接发布的小红书
 posts/<年份>-Wxx/<今日日期>-<选题短名>/     # 周目录与 weekly/ 的周次对齐
 ├── 正文.md          标题 + 正文 + 标签 + 配图清单
 ├── 事实核对.md      每条可核实陈述 → 原文出处（用户发布前人工终审用）
-├── 卡片.js / 卡片源文件.pptx
+├── 卡片.js / 卡片.html / cards/*.png
 └── 封面卡.png / 内容卡1-*.png / 内容卡2-*.png   1242×1656 (3:4)
 ```
 
@@ -37,9 +37,15 @@ posts/<年份>-Wxx/<今日日期>-<选题短名>/     # 周目录与 weekly/ 的
 2. **先写 事实核对.md 再写成稿**：正文里每个数字/论断一行，标注论文位置，核对状态列留 `[ ]` 给用户。写成稿时若发现某陈述找不到原文依据，删掉而不是模糊化。
 3. **成稿**：读 `templates/小红书笔记模板.md`（正文骨架、深度要求与硬约束以它为准）；**文风基准（2026-10-14 起）**：读 `references/文风参考-清熙体.md`，按其 7 节拍 + 8 条执行清单写（类比开场、动词化小标题、一句一段、硬核数字精确到个位、不鸡汤收口）。成稿后执行去 AI 味工序：读已安装的 humanize-writing skill（`~/.workbuddy/skills/humanize-writing/SKILL.md`）按其 8 遍流程逐遍过稿，配合 `references/中文AI味清单.md`（中文专属词表）。写完必须实测字数：`python scripts/count_body.py <正文.md 路径>`，超了就删，不注水。
 4. **抓真实素材（必做，2026-10-20 起）**：读 `references/真实素材规范.md`，在成稿目录写 `shots-task.json`，跑 `scripts/fetch_shots.js` 抓真实页面截图到 `shots/`（热点帖 ≥2 张、合集帖每篇 1 张；封面卡必须有真实主视觉）。抓不到一手页面就退到官方物料/权威媒体，都没有就不上图——**不许 AI 编图或手搓假界面**。
-5. **做卡片**：读 `references/卡片规范.md`；热点帖从 `assets/卡片骨架-热点帖.js` 复制为 `posts/.../卡片.js`，合集帖参考 `posts/2026-W42/周刊-2026-10-18-本周AI前沿TOP7/卡片v2.js`。嵌图统一用 `assets/卡片组件.js` 的 `shotBox()`（自带浏览器地址栏外壳）。运行 `NODE_PATH="$(npm root -g)" node 卡片.js` 生成 `卡片源文件.pptx`。
-6. **渲染**：`python scripts/render_cards.py 卡片源文件.pptx .` → 三张 1242×1656 PNG（需 LibreOffice）。
-7. **视觉审查**：把三张 PNG 交给视觉审查（人工或子代理）审版式（溢出/对比度/对齐），不通过的项改 卡片.js 后重渲再审。
+5. **做卡片（HTML 引擎，2026-10-21 起）**：读 `references/卡片视觉规范.md`。引擎在 `assets/卡片-HTML/`：
+   - `cards.js` 出 HTML（四个主题 editorial / stage / notebook / instrument，组件 cover / toc / paper / content / compare / tail）
+   - `render.js` 用 Playwright 逐张截图 + 自动查缺图与越界
+   参考实现：合集帖抄 `posts/2026-W42/周刊-2026-10-18-本周AI前沿TOP7/卡片-编辑风.js`（全套 10 张）。
+   主题默认：**周日周刊全套 editorial；每日热点封面 stage + 内页 editorial；社会话题内页 notebook；技术硬题材整篇 instrument**。
+   命令：`NODE_PATH=C:/Users/Lenovo/.workbuddy/binaries/node/workspace/node_modules "C:/Users/Lenovo/.workbuddy/binaries/node/versions/22.22.2-6/node.exe" 卡片.js`
+   ⚠️ 换版式时**不许顺手改文案**——截图、标题、数字必须锁在同一个数据对象里，改一个看另外两个。
+6. **渲染**：`NODE_PATH=C:/Users/Lenovo/.workbuddy/binaries/node/workspace/node_modules "C:/Users/Lenovo/.workbuddy/binaries/node/versions/22.22.2-6/node.exe" "E:/自媒体运营/ai-paper-to-xhs/skill/assets/卡片-HTML/render.js" --html 卡片.html --out .` → 每张 2484×3312 PNG，并打印缺图/越界告警（`文字被裁 10–40px` 是中文行高溢出的误报，超 40px 再当真）。
+7. **视觉审查**：逐张 Read 看一遍（自检查不了「标题和图配错」）。同时看四件事：文字越界 / 截图是否被裁掉关键信息 / 底部是否贴边 / 留白断层是否 >300px 且没填。不合格改 `卡片.js` 后重渲。
 8. **回填台账**：`topics.xlsx` 候选清单该行状态 → `已成稿`；「发布记录」加一行，发布链接与数据留空给用户发布后回填。
 9. **交付提醒**：明确告诉用户先过一遍 `事实核对.md` 再发布，发布时按平台要求勾选 AIGC 声明。终审通过前不要替用户发布。
 
